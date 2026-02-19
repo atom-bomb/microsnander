@@ -195,6 +195,7 @@
 #define _SPI_NAND_DEVICE_ID_FS35ND01GS1F1	0xB1
 #define _SPI_NAND_DEVICE_ID_FS35ND02GS2F1	0xA2
 #define _SPI_NAND_DEVICE_ID_FS35ND02GD1F1	0xB2
+#define _SPI_NAND_DEVICE_ID_FS35SQB002G  	0x52
 #define _SPI_NAND_DEVICE_ID_DS35Q2GA		0x72
 #define _SPI_NAND_DEVICE_ID_DS35Q1GA		0x71
 #define _SPI_NAND_DEVICE_ID_CS11G0T0A0AA	0x00
@@ -1580,6 +1581,21 @@ static const struct SPI_NAND_FLASH_INFO_T spi_nand_flash_tables[] = {
 		ptr_name:				"FORESEE FS35ND02GD1F1",
 		mfr_id:					_SPI_NAND_MANUFACTURER_ID_FORESEE,
 		dev_id:					_SPI_NAND_DEVICE_ID_FS35ND02GD1F1,
+		device_size:				_SPI_NAND_CHIP_SIZE_2GBIT,
+		page_size:				_SPI_NAND_PAGE_SIZE_2KBYTE,
+		oob_size:				_SPI_NAND_OOB_SIZE_128BYTE,
+		erase_size:				_SPI_NAND_BLOCK_SIZE_128KBYTE,
+		dummy_mode:				SPI_NAND_FLASH_READ_DUMMY_BYTE_APPEND,
+		read_mode:				SPI_NAND_FLASH_READ_SPEED_MODE_DUAL,
+		write_mode:				SPI_NAND_FLASH_WRITE_SPEED_MODE_SINGLE,
+		oob_free_layout:			&ooblayout_type1,
+		feature:				SPI_NAND_FLASH_FEATURE_NONE,
+	},
+
+	{
+		ptr_name:				"FORESEE FS35SQB002G",
+		mfr_id:					_SPI_NAND_MANUFACTURER_ID_FORESEE,
+		dev_id:					_SPI_NAND_DEVICE_ID_FS35SQB002G,
 		device_size:				_SPI_NAND_CHIP_SIZE_2GBIT,
 		page_size:				_SPI_NAND_PAGE_SIZE_2KBYTE,
 		oob_size:				_SPI_NAND_OOB_SIZE_128BYTE,
@@ -3794,11 +3810,15 @@ static void spi_nand_manufacute_init( struct SPI_NAND_FLASH_INFO_T *ptr_device_t
 	else if(((ptr_device_t->mfr_id == _SPI_NAND_MANUFACTURER_ID_FORESEE) && (ptr_device_t->dev_id == _SPI_NAND_DEVICE_ID_FS35ND02GS2F1)) ||
 			((ptr_device_t->mfr_id == _SPI_NAND_MANUFACTURER_ID_FORESEE) && (ptr_device_t->dev_id == _SPI_NAND_DEVICE_ID_FS35ND02GD1F1)) ||
 			((ptr_device_t->mfr_id == _SPI_NAND_MANUFACTURER_ID_FORESEE) && (ptr_device_t->dev_id == _SPI_NAND_DEVICE_ID_FS35ND01GS1F1)) ||
-			((ptr_device_t->mfr_id == _SPI_NAND_MANUFACTURER_ID_FORESEE) && (ptr_device_t->dev_id == _SPI_NAND_DEVICE_ID_FS35ND01GD1F1)))
+			((ptr_device_t->mfr_id == _SPI_NAND_MANUFACTURER_ID_FORESEE) && (ptr_device_t->dev_id == _SPI_NAND_DEVICE_ID_FS35ND01GD1F1)) ||
+			((ptr_device_t->mfr_id == _SPI_NAND_MANUFACTURER_ID_FORESEE) && (ptr_device_t->dev_id == _SPI_NAND_DEVICE_ID_FS35SQB002G)))
 	{
 		/* 1. Unlock All block */
 		spi_nand_protocol_get_status_reg_1(&feature);
-		feature &= 0xC7;
+		if (ptr_device_t->dev_id == _SPI_NAND_DEVICE_ID_FS35SQB002G)
+			feature &= 0x83;
+		else
+			feature &= 0xC7;
 		spi_nand_protocol_set_status_reg_1(feature);
 
 		/* 2. Enable Qual mode */
